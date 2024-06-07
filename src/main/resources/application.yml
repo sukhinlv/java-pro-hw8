@@ -60,4 +60,14 @@ springdoc:
     url: /limit-service-rest-v1.yaml # Документацию для Сваггера генерируем на основе спецификации
 
 app:
-  default-limit: ${APP_DEFAULT_LIMIT:10000}  # TODO добавить таблицу типа Key/Value и эндпоинт для изменения на лету
+  user-default-limit: ${USER_DEFAULT_LIMIT:10000}  # TODO добавить таблицу типа Key/Value и эндпоинт для изменения на лету
+  housekeeping:
+    enabled: ${HOUSEKEEPING_ENABLED:true}
+    cron: ${HOUSEKEEPING_CRON:0 0 1 * * *} # в час ночи каждый день
+    fetch-records-at-once: ${HOUSEKEEPING_FETCH_RECORDS_AT_ONCE:100000}
+    housekeeping-max-duration:  ${HOUSEKEEPING_MAX_DURATION:PT23H}
+  limit-service:
+    transaction-max-duration: ${LIMIT_SERVICE_TRANSACTION_MAX_DURATION:30} # длительность транзакции задается в секундах
+    max-attempts: ${LIMIT_SERVICE_MAX_ATTEMPTS:3}
+    delay: ${LIMIT_SERVICE_DELAY:1000}
+

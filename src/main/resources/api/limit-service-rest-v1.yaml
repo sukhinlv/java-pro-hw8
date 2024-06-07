@@ -6,21 +6,18 @@ info:
     name: Сухин Леонид Викторович
     email: leva1981@yandex.ru
     url: https://t.me/levaryazan
-  description: API для работы с продуктовым сервисом
+  description: API для работы с сервисом лимитов
 tags:
   -
-    name: product-controller
-    description: Методы работы с продуктами
-  -
-    name: payment-controller
-    description: Методы работы с платежами
+    name: limit-controller
+    description: Методы работы с лимитами
 paths:
-  /products/for-user:
+  /limit:
     get:
-      description: Метод предназначен для получения списка продуктов пользователя
-      operationId: getUserProducts
+      description: Метод возвращает текущий лимит для пользователя
+      operationId: getLimit
       tags:
-        - product-controller
+        - limit-controller
       parameters:
         -
           name: userId
@@ -33,21 +30,13 @@ paths:
             format: int64
       responses:
         '200':
-          description: Список продуктов пользователя
+          description: Текущий доступный лимит
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Products'
+                $ref: '#/components/schemas/CurrentLimit'
         '400':
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  -
-                    $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Not Found
           content:
             application/json:
               schema:
@@ -70,21 +59,85 @@ paths:
                 oneOf:
                   -
                     $ref: '#/components/schemas/ErrorResponse'
-  /payment:
-    put:
-      description: Метод предназначен для обработки пользовательского платежа с использованием выбранного продукта
-      operationId: putPayment
+    post:
+      description: Метод пытается уменьшить текущий лимит пользователя
+      operationId: postLimit
       tags:
-        - payment-controller
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Payment'
+        - limit-controller
+      parameters:
+        -
+          name: userId
+          in: query
+          required: true
+          allowEmptyValue: false
+          description: Id пользователя
+          schema:
+            type: integer
+            format: int64
+        -
+          name: value
+          in: query
+          required: true
+          allowEmptyValue: false
+          description: Значение, на которое надо уменьшить лимит
+          schema:
+            type: integer
+            format: int64
       responses:
-        '200':
-          description: Подтверждение успешного проведения платежа
+        '204':
+          description: Подтверждение успешного изменения лимита
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    $ref: '#/components/schemas/ErrorResponse'
+  /limit/rollback:
+    post:
+      description: Метод предназначен для отмены применения лимита
+      operationId: rollbackLimit
+      tags:
+        - limit-controller
+      parameters:
+        -
+          name: userId
+          in: query
+          required: true
+          allowEmptyValue: false
+          description: Id пользователя
+          schema:
+            type: integer
+            format: int64
+        -
+          name: value
+          in: query
+          required: true
+          allowEmptyValue: false
+          description: Значение, на которое надо уменьшить лимит
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Изменение лимита успешно отменено
         '400':
           description: Bad Request
           content:
@@ -119,67 +172,25 @@ paths:
                     $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    Products:
-      type: array
-      description: Список продуктов пользователя
-      x-field-extra-annotation: '@lombok.Builder.Default'
-      items:
-        $ref: '#/components/schemas/Product'
-    Product:
+    CurrentLimit:
       type: object
-      description: Данные продукта
-      additionalProperties: false
-      required:
-        - id
-        - account
-        - productType
+      description: Идентификатор пользователя и его текущий лимит
       properties:
-        id:
+        userId:
           type: integer
           format: int64
-          description: Id продукта
+          description: Id пользователя
           example: '552090181378957492'
-        account:
+        limit_date:
           type: string
-          minLength: 1
-          maxLength: 20
-          description:  Счет
-        balance:
+          format: date
+          description: Дата лимита
+          example: '2024-06-07'
+        limit:
           type: integer
           format: int64
-          description: Баланс
-          example: '15000'
-        productType:
-          type: object
-          description: Тип продукта
-          required:
-            - id
-            - name
-          properties:
-            id:
-              type: integer
-              description: Id типа продукта
-            name:
-              type: string
-              description: Название продукта
-              minLength: 1
-              maxLength: 100
-    Payment:
-      description: информация о платеже
-      required:
-        - productId
-        - amount
-      properties:
-        productId:
-          type: integer
-          format: int64
-          description: Id продукта для списания средств
-          example: '552090181378957492'
-        amount:
-          type: integer
-          format: int64
-          description: Сумма к списанию
-          example: '1500'
+          description: Текущий лимит пользователя
+          example: '8750'
     ErrorResponse:
       type: object
       description: Типовая ошибка для передачи на front-end

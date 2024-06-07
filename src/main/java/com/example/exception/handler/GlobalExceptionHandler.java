@@ -1,9 +1,8 @@
 package com.example.exception.handler;
 
 import com.example.dao.model.generated.ErrorResponseDto;
-import com.example.exception.InsufficientFunds;
-import com.example.exception.ProductNotFound;
-import com.example.exception.UserNotFound;
+import com.example.exception.LimitExceeded;
+import com.example.exception.UsedLimitNotFound;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -41,20 +40,14 @@ public class GlobalExceptionHandler {
     ) {
     }
 
-    @ExceptionHandler(InsufficientFunds.class)
-    public ResponseEntity<ErrorResponseDto> handleInsufficientFounds(InsufficientFunds exception) {
+    @ExceptionHandler(LimitExceeded.class)
+    public ResponseEntity<ErrorResponseDto> handleInsufficientFounds(LimitExceeded exception) {
         log.error(exception.getMessage(), exception);
         return errorResponseDtoEntity(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
     }
 
-    @ExceptionHandler(ProductNotFound.class)
-    public ResponseEntity<ErrorResponseDto> handleProductNotFound(ProductNotFound exception) {
-        log.error(exception.getMessage(), exception);
-        return errorResponseDtoEntity(HttpStatus.NOT_FOUND, exception.getMessage());
-    }
-
-    @ExceptionHandler(UserNotFound.class)
-    public ResponseEntity<ErrorResponseDto> handleUserNotFound(UserNotFound exception) {
+    @ExceptionHandler(UsedLimitNotFound.class)
+    public ResponseEntity<ErrorResponseDto> handleProductNotFound(UsedLimitNotFound exception) {
         log.error(exception.getMessage(), exception);
         return errorResponseDtoEntity(HttpStatus.NOT_FOUND, exception.getMessage());
     }

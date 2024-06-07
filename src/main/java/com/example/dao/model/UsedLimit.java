@@ -6,10 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +15,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
@@ -25,8 +24,8 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "products")
-public class Product {
+@Table(name = "used_limits")
+public class UsedLimit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,20 +35,19 @@ public class Product {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @NotBlank
-    @Size(min = 1, max = 20)
-    @Column(name = "account", nullable = false)
-    private String account;
+    @NotNull
+    @Column(name = "limit_date", nullable = false)
+    private LocalDate limitDate;
 
     @NotNull
-    @Positive
-    @Column(name = "balance", nullable = false)
-    private Long balance;
+    @PositiveOrZero
+    @Column(name = "daily_limit", nullable = false)
+    private Long dailyLimit;
 
     @NotNull
-    @Column(name = "product_type", nullable = false)
-    private ProductType productType;
-
+    @PositiveOrZero
+    @Column(name = "current_limit", nullable = false)
+    private Long currentLimit;
 
     @Override
     public final boolean equals(Object o) {
@@ -62,7 +60,7 @@ public class Product {
                 hibernateProxy.getHibernateLazyInitializer().getPersistentClass() :
                 this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Product that = (Product) o;
+        UsedLimit that = (UsedLimit) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

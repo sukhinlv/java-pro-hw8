@@ -27,7 +27,8 @@ class LimitServiceTestApplication {
                 .initializers(applicationContext -> new TestcontainersInitializer().initialize(applicationContext))
                 .listeners(event -> {
                     if (event instanceof ApplicationReadyEvent) {
-                        initDb();
+                        // TODO убрать заглушку
+                        // initDb();
                     }
                 })
                 .run(args);
@@ -37,8 +38,7 @@ class LimitServiceTestApplication {
         PGSimpleDataSource ds = getPgSimpleDataSource();
         try (Connection connection = ds.getConnection()) {
             List.of(
-                    "create_users.sql",
-                    "create_products.sql"
+                    "create_users.sql"
             ).forEach(script -> executeScript(script, connection));
         } catch (SQLException e) {
             throw new RuntimeException(e);
