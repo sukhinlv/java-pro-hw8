@@ -41,13 +41,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(LimitExceeded.class)
-    public ResponseEntity<ErrorResponseDto> handleInsufficientFounds(LimitExceeded exception) {
+    public ResponseEntity<ErrorResponseDto> handleLimitExceeded(LimitExceeded exception) {
         log.error(exception.getMessage(), exception);
         return errorResponseDtoEntity(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
     }
 
     @ExceptionHandler(UsedLimitNotFound.class)
-    public ResponseEntity<ErrorResponseDto> handleProductNotFound(UsedLimitNotFound exception) {
+    public ResponseEntity<ErrorResponseDto> handleUsedLimitNotFound(UsedLimitNotFound exception) {
         log.error(exception.getMessage(), exception);
         return errorResponseDtoEntity(HttpStatus.NOT_FOUND, exception.getMessage());
     }
